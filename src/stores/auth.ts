@@ -1,77 +1,85 @@
-import { defineStore } from 'pinia'
-import { useStorage, RemovableRef } from '@vueuse/core'
+import { defineStore } from "pinia";
+import { useStorage, RemovableRef } from "@vueuse/core";
 
-import axiosInstance from '../services/AxiosInstance';
-import { Auth, AuthState } from '../types/auth'
-import router from '../router';
-import { useTodoStore } from './todo';
-import axios, { AxiosError } from 'axios';
+import axiosInstance from "../services/AxiosInstance";
+import { Auth, AuthState } from "../types/auth";
+import router from "../router";
+import { useTodoStore } from "./todo";
+import axios, { AxiosError } from "axios";
 
 interface AuthStoreState {
-  auth: RemovableRef<Auth>
-  loginLoading: boolean
-  loginSuccess: boolean
-  loginError: string
-  signupLoading: boolean
-  signupSuccess: boolean
-  signupError: string
+  auth: RemovableRef<Auth>;
+  loginLoading: boolean;
+  loginSuccess: boolean;
+  loginError: string;
+  signupLoading: boolean;
+  signupSuccess: boolean;
+  signupError: string;
 }
 
 interface AuthStoreGetters {
-  token: (state: AuthState) => string
-  authenticated: (state: AuthState) => boolean
-  name: (state: AuthState) => string
+  token: (state: AuthState) => string;
+  authenticated: (state: AuthState) => boolean;
+  name: (state: AuthState) => string;
 }
 
 interface AuthStoreActions {
-  signin: (params: { email: string, password: string }) => void
-  signup: (params: { name: string, email: string, password: string, confirmPassword: string }) => void
-  logout: () => void
-  setAuth: (payload: Auth) => void
-  clearLoginReq: () => void
-  clearSignupReq: () => void
+  signin: (params: { email: string; password: string }) => void;
+  signup: (params: {
+    name: string;
+    email: string;
+    password: string;
+    confirmPassword: string;
+  }) => void;
+  logout: () => void;
+  setAuth: (payload: Auth) => void;
+  clearLoginReq: () => void;
+  clearSignupReq: () => void;
 }
 
 const initialState: Auth = {
-  token: '',
-  name: '',
-  id: '',
+  token: "",
+  name: "",
+  id: "",
   authenticated: false,
   createdAt: null,
   updatedAt: null,
 };
 
 const state = (): AuthStoreState => ({
-  auth: useStorage('auth', initialState),
+  auth: useStorage("auth", initialState),
   loginLoading: false,
   loginSuccess: false,
-  loginError: '',
+  loginError: "",
   signupLoading: false,
   signupSuccess: false,
-  signupError: '',
-})
+  signupError: "",
+});
 
-const token = (state: AuthState): string => state.auth.token
-const authenticated = (state: AuthState): boolean => state.auth.authenticated
-const name = (state: AuthState): string => state.auth.name
+const token = (state: AuthState): string => state.auth.token;
+const authenticated = (state: AuthState): boolean => state.auth.authenticated;
+const name = (state: AuthState): string => state.auth.name;
 
 const getters: AuthStoreGetters = {
   token,
   authenticated,
   name,
-}
+};
 
-const signin = async (params: { email: string, password: string }): Promise<void> => {
+const signin = async (params: {
+  email: string;
+  password: string;
+}): Promise<void> => {
   const authStore = useAuthStore();
   try {
     authStore.$patch({
       loginLoading: true,
       loginSuccess: false,
-      loginError: '',
+      loginError: "",
       signupSuccess: false,
-      signupError: '',
-    })
-    const res = await axiosInstance.post('auth/login', params)
+      signupError: "",
+    });
+    const res = await axiosInstance.post("auth/login", params);
     if (res.status === 200 && res.data) {
       const resData = res.data;
       const authData = {
@@ -81,15 +89,14 @@ const signin = async (params: { email: string, password: string }): Promise<void
         authenticated: true,
         createdAt: resData.user.created_at,
         updatedAt: resData.user.updated_at,
-      }
-      setAuth(authData)
-      router.push('/')
+      };
+      setAuth(authData);
+      router.push("/");
     }
   } catch (error) {
-    let errMsg = ''
+    let errMsg = "";
     if (axios.isAxiosError(error)) {
       if (error.response && error.response.data) {
-
         const err = error.response.data as { message: string };
         errMsg = err.message;
       }
@@ -97,69 +104,77 @@ const signin = async (params: { email: string, password: string }): Promise<void
     authStore.$patch({
       loginLoading: false,
       loginSuccess: false,
-      loginError: errMsg
-    })
+      loginError: errMsg,
+    });
   }
-}
+};
 
-const signup = async (params: { name: string, email: string, password: string, confirmPassword: string }): Promise<void> => {
+const signup = async (params: {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}): Promise<void> => {
   const authStore = useAuthStore();
   try {
     authStore.$patch({
       signupLoading: true,
       signupSuccess: false,
-      signupError: ''
-    })
-    const res = await axiosInstance.post('auth/register', params)
+      signupError: "",
+    });
+    const res = await axiosInstance.post("auth/register", params);
     if (res.status === 200) {
       authStore.$patch({
         signupLoading: false,
         signupSuccess: true,
-        signupError: ''
-      })
-      router.replace('/signin')
+        signupError: "",
+      });
+      router.replace("/signin");
     }
   } catch (error) {
-    let errMsg = ''
+    let errMsg = "";
     if (axios.isAxiosError(error)) {
       if (error.response && error.response.data) {
         const err = error.response.data as { message: string };
-        errMsg = err.message === 'Validation Error' ? 'The email has already been taken.' : err.message;
+        errMsg =
+          err.message === "Validation Error"
+            ? "The email has already been taken."
+            : err.message;
       }
     }
     authStore.$patch({
       signupLoading: false,
       signupSuccess: false,
-      signupError: errMsg
-    })
+      signupError: errMsg,
+    });
   }
-}
+};
 
 const logout = async (): Promise<void> => {
   try {
     const authStore = useAuthStore();
     const todoStore = useTodoStore();
-    const res = await axiosInstance.post('auth/logout');
+    const res = await axiosInstance.post("auth/logout");
     if (res.status === 204) {
       authStore.$patch({
-        auth: initialState
+        auth: initialState,
       });
       todoStore.$patch({
         todos: [],
         todoLoading: false,
         isAdding: false,
         isAddSuccess: false,
-        addError: '',
+        addError: "",
         isDeleting: false,
         isDeleteSuccess: false,
-        deleteError: ''
+        deleteError: "",
       });
-      router.replace('/signin')
+      router.replace("/signin");
     }
   } catch (error) {
-    console.log(error, 'error');
+    console.log(error, "error");
   }
-}
+};
 
 const setAuth = (payload: Auth) => {
   const authStore = useAuthStore();
@@ -167,25 +182,24 @@ const setAuth = (payload: Auth) => {
     auth: payload,
     loginLoading: false,
     loginSuccess: true,
-    loginError: ''
-  })
+    loginError: "",
+  });
 };
 
 const clearLoginReq = () => {
   const authStore = useAuthStore();
   authStore.$patch({
-    loginError: '',
+    loginError: "",
     loginSuccess: false,
-    
-  })
+  });
 };
 
 const clearSignupReq = () => {
   const authStore = useAuthStore();
   authStore.$patch({
     signupSuccess: false,
-    signupError: ''
-  })
+    signupError: "",
+  });
 };
 
 const actions: AuthStoreActions = {
@@ -198,8 +212,8 @@ const actions: AuthStoreActions = {
 };
 
 export const useAuthStore = defineStore({
-  id: 'auth',
+  id: "auth",
   state,
   getters: { ...getters },
   actions,
-})
+});

@@ -1,32 +1,37 @@
 <script setup lang="ts">
-import { watch, onUnmounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import SignUpFormVue from '../components/SignUpForm.vue'
-import AlertVue from '../components/Alert.vue'
-import { useAuthStore } from '../stores/auth'
+import { watch, onUnmounted } from "vue";
+import { storeToRefs } from "pinia";
+import SignUpFormVue from "../components/SignUpForm.vue";
+import AlertVue from "../components/Alert.vue";
+import { useAuthStore } from "../stores/auth";
 
-const authStore = useAuthStore()
-const { signupError, signupLoading } = storeToRefs(authStore)
-let timeout: ReturnType<typeof setTimeout>
+const authStore = useAuthStore();
+const { signupError, signupLoading } = storeToRefs(authStore);
+let timeout: ReturnType<typeof setTimeout>;
 
-const onSubmit = (params: { name: string, email: string, password: string, confirmPassword: string }) => {
-  clearTimeout(timeout)
-  authStore.signup(params)
-}
+const onSubmit = (params: {
+  name: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}) => {
+  clearTimeout(timeout);
+  authStore.signup(params);
+};
 
 const handleClose = () => {
-  authStore.clearSignupReq()
+  authStore.clearSignupReq();
 };
 
 watch(signupError, (signupError) => {
   if (signupError) {
-    timeout = setTimeout(handleClose, 5000)
+    timeout = setTimeout(handleClose, 5000);
   }
-})
+});
 
 onUnmounted(() => {
-  clearTimeout(timeout)
-})
+  clearTimeout(timeout);
+});
 </script>
 
 <template>
@@ -41,7 +46,12 @@ onUnmounted(() => {
     </div>
     <SignUpFormVue :onSubmit="onSubmit" :isLoading="signupLoading" />
   </div>
-  <AlertVue type="danger" :message="signupError" :open="!!signupError" :onClose="handleClose" />
+  <AlertVue
+    type="danger"
+    :message="signupError"
+    :open="!!signupError"
+    :onClose="handleClose"
+  />
 </template>
 
 <style scoped>

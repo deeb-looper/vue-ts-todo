@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { reactive, computed, nextTick } from 'vue';
-import useValidate from '@vuelidate/core';
-import { required, helpers, email, minLength } from '@vuelidate/validators';
+import { reactive, computed /* nextTick */ } from "vue";
+import useValidate from "@vuelidate/core";
+import { required, helpers, email, minLength } from "@vuelidate/validators";
 
 type Props = {
-  onSubmit: (params: { email: string, password: string }) => void;
-  isLoading?: boolean
+  onSubmit: (params: { email: string; password: string }) => void;
+  isLoading?: boolean;
 };
 
 const props = defineProps<Props>();
 
-const initialState = { email: '', password: '' };
+const initialState = { email: "", password: "" };
 
 const state = reactive({ ...initialState });
 
 const rules = computed(() => {
   return {
     email: {
-      required: helpers.withMessage('Email is required', required),
+      required: helpers.withMessage("Email is required", required),
       email,
     },
     password: {
-      required: helpers.withMessage('Password is required', required),
+      required: helpers.withMessage("Password is required", required),
       minLength: minLength(8),
     },
   };
@@ -29,10 +29,10 @@ const rules = computed(() => {
 
 const v$ = useValidate(rules, state);
 
-const clearForm = async () => {
-  nextTick(() => { v$.value.$reset() });
-  Object.assign(state, initialState);
-};
+// const clearForm = async () => {
+//   nextTick(() => { v$.value.$reset() });
+//   Object.assign(state, initialState);
+// };
 
 const handleSubmit = () => {
   v$.value.$validate();
@@ -49,29 +49,44 @@ const handleSubmit = () => {
       <label class="form-label" for="email">Email</label>
       <input id="email" class="form-control" v-model="state.email" />
       <span class="field-error px-2">
-        {{ v$.email.$error && v$.email.$errors[0].$message || '' }}
+        {{ (v$.email.$error && v$.email.$errors[0].$message) || "" }}
       </span>
     </div>
-
 
     <!-- Password input -->
     <div class="form-outline mb-2">
       <label class="form-label" for="password">Password</label>
-      <input type="password" id="password" class="form-control" v-model="state.password" />
+      <input
+        type="password"
+        id="password"
+        class="form-control"
+        v-model="state.password"
+      />
       <span class="field-error px-2">
-        {{ v$.password.$error && v$.password.$errors[0].$message || '' }}
+        {{ (v$.password.$error && v$.password.$errors[0].$message) || "" }}
       </span>
     </div>
 
     <div class="btn-wrapper">
-      <button :disabled="isLoading" type="submit" @click="handleSubmit" class="btn signin">
-        <div v-if="isLoading" class="spinner-border spinner-border-sm text-warning" role="status">
+      <button
+        :disabled="isLoading"
+        type="submit"
+        @click="handleSubmit"
+        class="btn signin"
+      >
+        <div
+          v-if="isLoading"
+          class="spinner-border spinner-border-sm text-warning"
+          role="status"
+        >
           <span class="visually-hidden">Loading...</span>
         </div>
         <span v-else>Sign in</span>
       </button>
       <span class="l-or">or</span>
-      <router-link to="/signup" type="button" class="btn signup">Sign up</router-link>
+      <router-link to="/signup" type="button" class="btn signup"
+        >Sign up</router-link
+      >
     </div>
   </div>
 </template>
@@ -107,7 +122,6 @@ const handleSubmit = () => {
 
 .btn.signin {
   background-color: var(--vt-c-primary);
-
 }
 
 .btn.signup {

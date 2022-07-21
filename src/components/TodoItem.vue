@@ -2,18 +2,22 @@
 interface Props {
   id: string;
   checked: boolean;
-  onChange: (params: { id: string, checked: boolean, content: string }) => void;
+  onChange: (params: { id: string; checked: boolean; content: string }) => void;
   content: string;
   onDelete: (id: string) => void;
-};
-const props = defineProps<Props>()
+}
+const props = defineProps<Props>();
 
 const handleDelete = () => {
   props.onDelete(props.id);
 };
 
 const handleChange = () => {
-  props.onChange({ id: props.id, checked: props.checked, content: props.content });
+  props.onChange({
+    id: props.id,
+    checked: props.checked,
+    content: props.content,
+  });
 };
 </script>
 
@@ -22,8 +26,13 @@ const handleChange = () => {
     <div class="l-g-wrapper">
       <div class="todo-l-w">
         <div class="ck-todo-w">
-          <input class="form-check-input me-1 ck-todo" type="checkbox" v-model="checked" aria-label="..."
-            @change="handleChange" />
+          <input
+            class="form-check-input me-1 ck-todo"
+            type="checkbox"
+            v-model="checked"
+            aria-label="..."
+            @change="handleChange"
+          />
         </div>
         <span :class="`${checked && 'todo-item-done'}`">
           {{ content }}
@@ -47,7 +56,6 @@ const handleChange = () => {
   text-decoration: line-through;
   color: #939393;
 }
-
 
 .ck-todo-w {
   margin-right: 10px;

@@ -1,19 +1,28 @@
 <script setup lang="ts">
 type Props = {
-  type: 'success' | 'danger'
-  message: string
-  onClose: () => void
-  open: boolean
-}
+  type: "success" | "danger";
+  message: string;
+  onClose: () => void;
+  open: boolean;
+};
 
 defineProps<Props>();
 </script>
 
 <template>
-  <div v-if="open" :class="`alert alert-${type} alert-td fade show slide-in d-flex justify-content-between`"
-    role="alert">
+  <div
+    v-if="open"
+    :class="`alert alert-${type} alert-td fade show slide-in d-flex justify-content-between`"
+    role="alert"
+  >
     {{ message }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" @click="onClose"></button>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+      @click="onClose"
+    ></button>
   </div>
 </template>
 

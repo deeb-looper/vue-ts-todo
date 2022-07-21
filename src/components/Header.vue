@@ -2,7 +2,7 @@
 type Props = {
   logout: () => void;
 };
-defineProps<Props>()
+defineProps<Props>();
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { reactive, computed, nextTick } from 'vue';
-import useValidate from '@vuelidate/core';
-import { required, helpers } from '@vuelidate/validators';
+import { reactive, computed, nextTick } from "vue";
+import useValidate from "@vuelidate/core";
+import { required, helpers } from "@vuelidate/validators";
 
 type Props = {
   onSubmit: (value: string) => void;
@@ -9,14 +9,14 @@ type Props = {
 
 const props = defineProps<Props>();
 
-const initialState = { todo: '' };
+const initialState = { todo: "" };
 
 const state = reactive({ ...initialState });
 
 const rules = computed(() => {
   return {
     todo: {
-      required: helpers.withMessage('Field is required', required),
+      required: helpers.withMessage("Field is required", required),
     },
   };
 });
@@ -24,7 +24,9 @@ const rules = computed(() => {
 const v$ = useValidate(rules, state);
 
 const clearForm = async () => {
-  nextTick(() => { v$.value.$reset() });
+  nextTick(() => {
+    v$.value.$reset();
+  });
   Object.assign(state, initialState);
 };
 
@@ -39,9 +41,20 @@ const handleSubmit = () => {
 
 <template>
   <div :class="`input-group ${!v$.$error && 'mb-4'}`">
-    <input type="text" class="form-control add-todo-input" placeholder="ADD TODO HERE..." aria-label="user todo"
-      aria-describedby="button-addon2" v-model="state.todo">
-    <button class="btn btn-add-todo" type="button" id="button-addon2" @click="handleSubmit">
+    <input
+      type="text"
+      class="form-control add-todo-input"
+      placeholder="ADD TODO HERE..."
+      aria-label="user todo"
+      aria-describedby="button-addon2"
+      v-model="state.todo"
+    />
+    <button
+      class="btn btn-add-todo"
+      type="button"
+      id="button-addon2"
+      @click="handleSubmit"
+    >
       <span class="btn-add-todo-label">+</span>
     </button>
   </div>
